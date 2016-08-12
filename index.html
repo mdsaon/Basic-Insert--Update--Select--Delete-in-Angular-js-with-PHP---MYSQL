@@ -1,0 +1,82 @@
+<html>
+<head>
+<title>Basic Insert,Update,Delete in Angular Js</title>
+<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+</head>
+<body>
+<div ng-app="myapp" ng-controller="cntrl">
+<form>
+Student Id:    <input type="text" ng-model="id" name="id" ng-disabled="obj.idisable"/><br/>
+Student Name:   <input type="text" ng-model="name" name="name"/><br/>
+<input type="button" value="{{btnName}}" ng-click="insertdata()" >
+{{msg}}
+</form>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Name</th>
+</tr>
+</thead>
+<tbody>
+<tr ng-repeat="tbstudent in data">
+<td>{{tbstudent.id}}</td>
+<td>{{tbstudent.name}}</td>
+<td><button ng-click="deleteStud(tbstudent.id);">Delete</button></td>
+<td><button ng-click="editStud(tbstudent.id, tbstudent.name);">Edit</button></td>
+</tr>
+</tbody>
+</table>
+</div>
+<script>
+var app = angular.module("myapp",[]);
+app.controller("cntrl",function($scope,$http){
+    $scope.obj={'idisable':false};
+	$scope.btnName="Insert";
+	
+	$scope.insertdata = function() {
+		$http.post("insert.php",{'id':$scope.id,'name':$scope.name, 'btnName':$scope.btnName})
+		.success(function(){
+			console.log("Inserted Successfully!");
+			if($http.post)
+			{
+			$scope.id="";
+			$scope.name="";
+			$scope.displayStud();
+			}
+			
+			
+		})
+}
+	$scope.displayStud=function(){
+		$http.get("select.php")
+		.success(function(data){
+			$scope.data=data
+		})
+	}
+	$scope.deleteStud=function(id){
+		$http.post("delete.php",{'id':id})
+		.success(function(){
+				$scope.msg="Data Deletion successfull";
+				$scope.displayStud();
+
+
+		})
+
+	}
+	
+	$scope.editStud=function(id, name)
+	{
+		$scope.id=id;
+		$scope.name=name;
+		$scope.btnName="Update";
+		$scope.obj.idisable=true;
+		$scope.displayStud();
+
+	}
+	
+});
+
+</script>
+</body>
+</html>
